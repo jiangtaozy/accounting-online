@@ -8,6 +8,14 @@ import (
     _ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+type JournalAccount struct {
+    gorm.Model
+    Name string // 名称
+    Category string // 类别
+    PaymentMethod string // 支付方式
+    Amount float64 // 金额，区分正负
+}
+
 // 资产负债表
 type BalanceSheet struct {
     gorm.Model
@@ -32,23 +40,37 @@ type BalanceSheet struct {
 // 利润表
 type IncomeStatement struct {
     gorm.Model
-    Item string // 项目名称
-    Category string // 类别
-    Income float64 // 收入
-    Expenses float64 // 费用
+    Beginning time.Time // 期初时间
+    Ending time.Time // 期末时间
+    Salary float64 // 工资
+    Interest float64 // 利息
+    OtherIncome float64 // 其他收入
+    Income float64 // 总收入
+    Food float64 // 饭费
+    House float64 // 住房
+    Transport float64 // 交通
+    Communication float64 // 通讯
+    Entertainment float64 // 娱乐
+    Clothing float64 // 衣服鞋帽
+    Invest float64 // 投资
+    CashGift float64 // 礼金
+    Family float64 // 亲属
+    Medical float64 // 医疗
+    OtherExpense float // 其他费用
+    Expense float64 // 总费用
     Profit float64 // 利润
-    PaymentMethod string // 支付方式
 }
 
 // 现金流量表
 type CashFlow struct {
     gorm.Model
-    Item string // 项目名称
-    Category string // 类别
+    Beginning time.Time // 期初时间
+    Ending time.Time // 期末时间
     CashInflow float64 // 现金流入
     CashOutflow float64 // 现金流出
-    NetCashFlow float64 // 现金净额
-    CashBalance float64 // 现金余额
+    NetCashFlow float64 // 现金流量净额
+    BeginningCashBalance float64 // 期初现金余额
+    EndingCashBalance float64 // 期末现金余额
 }
 
 func InitDb() {
