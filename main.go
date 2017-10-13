@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
     "github.com/gin-gonic/gin"
     "./db"
 )
@@ -20,10 +21,14 @@ func main () {
 
     // record data
     router.POST("/", func(c *gin.Context) {
-	item := c.PostForm("item")
+	//item := c.PostForm("item")
 	// todo
-    }
+    })
 
     // listen and serve on 0.0.0.0:8080
-    router.Run()
+    // router.Run()
+
+    // listen 1025
+    router.Run(":1025")
+    fmt.Println("listen 8080")
 }

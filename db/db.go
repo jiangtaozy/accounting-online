@@ -1,12 +1,29 @@
 package db
 
 import (
+    "time"
     "fmt"
     "log"
     // import GORM-related packages
     "github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/postgres"
 )
+
+func InitDb() {
+    // connect to the "accounting" database as
+    // the "dest" user.
+    const addr = "postgresql://dest@localhost:26257/accounting?sslmode=disable"
+    db, err := gorm.Open("postgres", addr)
+    if err != nil {
+	log.Fatal(err)
+    }
+    fmt.Println(db);
+    defer db.Close()
+
+    // automatically create table based on model.
+    db.AutoMigrate(&JournalAccount{}, &BalanceSheet{}, &IncomeStatement{}, &CashFlow{})
+    fmt.Println("db auto migrate is done")
+}
 
 type JournalAccount struct {
     gorm.Model
@@ -56,7 +73,7 @@ type IncomeStatement struct {
     CashGift float64 // 礼金
     Family float64 // 亲属
     Medical float64 // 医疗
-    OtherExpense float // 其他费用
+    OtherExpense float64 // 其他费用
     Expense float64 // 总费用
     Profit float64 // 利润
 }
@@ -71,18 +88,4 @@ type CashFlow struct {
     NetCashFlow float64 // 现金流量净额
     BeginningCashBalance float64 // 期初现金余额
     EndingCashBalance float64 // 期末现金余额
-}
-
-func InitDb() {
-    // connect to the "accounting" database as
-    // the "dest" user.
-    const addr = "postgresql://dest@localhost:26257/accounting?sslmode=disable"
-    db, err := gorm.Open("postgres", addr)
-    if err != nil {
-	log.Fatal(err)
-    }
-    defer db.Close()
-
-    // automatically create table based on model.
-    db.AutoMigrate(&BalanceSheet{}, &IncomeStatement{}, &CashFlow{})
 }
