@@ -1,3 +1,5 @@
+# backend
+
 ### install gin
 
 go get github.com/gin-gonic/gin
@@ -20,7 +22,7 @@ $ cockroach user set dest --insecure
 
 ### create a database and grant privileges
 
-$ cockroach sql --insecure
+$ cockroach sql --insecure --database=accounting
 
 create database accounting;
 
@@ -31,3 +33,16 @@ grant all on database accounting to dest;
 ### SHOW TABLES FROM accounting;
 
 ### show columns from accounting.journal_accounts;
+
+### alter table accounting.journal_accounts drop column amount;
+
+# front end
+
+### create a react app
+
+    npm install -g create-react-app
+    create-react-app my-app
+
+    cd my-app
+    npm start
+    npm run build

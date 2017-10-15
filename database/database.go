@@ -1,36 +1,28 @@
-package db
+package database
 
 import (
     "time"
-    "fmt"
-    "log"
     // import GORM-related packages
     "github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-func InitDb() {
-    // connect to the "accounting" database as
-    // the "dest" user.
-    const addr = "postgresql://dest@localhost:26257/accounting?sslmode=disable"
-    db, err := gorm.Open("postgres", addr)
-    if err != nil {
-	log.Fatal(err)
-    }
-    fmt.Println(db);
-    defer db.Close()
-
+func InitDb(db *gorm.DB) {
     // automatically create table based on model.
-    db.AutoMigrate(&JournalAccount{}, &BalanceSheet{}, &IncomeStatement{}, &CashFlow{})
-    fmt.Println("db auto migrate is done")
+    db.AutoMigrate(
+        &JournalAccount{},
+        &BalanceSheet{},
+        &IncomeStatement{},
+        &CashFlow{},
+    )
 }
 
 type JournalAccount struct {
     gorm.Model
     Name string // 名称
     Category string // 类别
-    PaymentMethod string // 支付方式
-    Amount float64 // 金额，区分正负
+    PayMethod string // 支付方式
+    Value float64 // 金额，区分正负
 }
 
 // 资产负债表
