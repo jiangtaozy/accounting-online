@@ -1,72 +1,91 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "strconv"
-    "github.com/gin-gonic/gin"
-    "github.com/gin-contrib/static"
-    "./database"
-    // import GORM-related packages
-    "github.com/jinzhu/gorm"
-    _ "github.com/jinzhu/gorm/dialects/postgres"
+	"./database"
+	"fmt"
+	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
+	"log"
+	//"strconv"
+	// import GORM-related packages
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-func main () {
+func main() {
 
-    // connect to the "accounting" database as the "dest" user.
-    const addr = "postgresql://dest@localhost:26257/accounting?sslmode=disable"
-    db, err := gorm.Open("postgres", addr)
-    if err != nil {
-	log.Fatal(err)
-    }
-    defer db.Close()
+	// connect to the "accounting" database as the "dest" user.
+	const addr = "postgresql://dest@localhost:26257/accounting?sslmode=disable"
+	db, err := gorm.Open("postgres", addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-    // init database
-    database.InitDb(db)
+	// init database
+	database.InitDb(db)
 
-    router := gin.Default()
+	router := gin.Default()
 
-    // serving static files
-    router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
+	// serving static files
+	router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
 
-    // get journal account
-    router.GET("/api/account", func(context *gin.Context) {
-        var accounts []database.JournalAccount
-        db.Find(&accounts)
-	context.JSON(200, gin.H{
-	    "status": "success",
-	    "data": accounts,
+	// get journal account
+	router.GET("/api/account", func(context *gin.Context) {
+		var accounts []database.JournalAccount
+		db.Find(&accounts)
+		fmt.Printf("accounts: %v", accounts)
+		context.JSON(200, gin.H{
+			"status": "success",
+			"data":   accounts,
+		})
 	})
-    })
 
-    // record journal account
-    router.POST("/api/account", func(context *gin.Context) {
-	name := context.PostForm("name")
-	category := context.PostForm("category")
-	paymethod := context.PostForm("paymethod")
-	value, err := strconv.ParseFloat(context.PostForm("value"), 64)
-        if(err != nil) {
-            fmt.Println(err)
-        }
-        account := database.JournalAccount {
-            Name: name,
-            Category: category,
-            PayMethod: paymethod,
-            Value: value,
-        }
-        db.Create(&account)
-        //fmt.Println(db.NewRecord(account))
-        if(!db.NewRecord(account)) {
-	    context.JSON(200, gin.H{
-	        "status": "success",
-	    })
-        } else {
-	    context.JSON(200, gin.H{
-	        "status": "fail",
-	    })
-        }
-    })
+	// record journal account
+	router.POST("/api/account", func(context *gin.Context) {
+		//Name := context.PostForm("Name")
+		//name := context.PostForm("name")
+		//fmt.Println("Name: " + Name)
+		//fmt.Println("name: " + name)
+		//Category := context.PostForm("Category")
+		//Paymethod := context.PostForm("Paymethod")
+		//Value, err := strconv.ParseFloat(context.PostForm("Value"), 64)
+		//if err != nil {
+		//	fmt.Println(err)
+		//}
+		//account := database.JournalAccount{
+		//	Name:      Name,
+		//	Category:  Category,
+		//	PayMethod: Paymethod,
+		//	Value:     Value,
+		//}
+		//type ValueStruct struct {
+		//	Value string `form:"Value" json:"Value" binding:"required"`
+		//}
+		//var valueStruct ValueStruct
+		//context.Bind(&valueStruct)
+		//fmt.Printf("valueStruct: %v", valueStruct)
+		var account database.JournalAccount
+		context.Bind(&account)
+		fmt.Printf("bind-account: %v", account)
+		//Value, err := strconv.ParseFloat(valueStruct.Value, 64)
+		//if err != nil {
+		//	fmt.Println(err)
+		//}
+		//account.Value = Value
+		//fmt.Printf("strconv-account: %v", account)
+		db.Create(&account)
+		fmt.Println(db.NewRecord(account))
+		if !db.NewRecord(account) {
+			context.JSON(200, gin.H{
+				"status": "success",
+			})
+		} else {
+			context.JSON(200, gin.H{
+				"status": "fail",
+			})
+		}
+	})
 
-    router.Run(":1025")
+	router.Run(":1025")
 }

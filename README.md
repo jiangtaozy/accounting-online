@@ -12,9 +12,13 @@ go get -u github.com/lib/pq
 
 go get -u github.com/jinzhu/gorm
 
+
+
 ### start a single-node cluster
 
 ~/workspace/project/accounting-online$ cockroach start --insecure --store=store-1 --host=localhost
+
+
 
 ### create a user
 
@@ -27,6 +31,8 @@ $ cockroach sql --insecure --database=accounting
 create database accounting;
 
 grant all on database accounting to dest;
+
+
 
 ## sql
 
