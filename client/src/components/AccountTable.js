@@ -5,16 +5,33 @@ class AccountTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      accountArray: [{"ID":288094287488352257,"CreatedAt":"2017-10-14T14:03:19.123259Z","UpdatedAt":"2017-10-14T14:03:19.123259Z","DeletedAt":null,"Name":"紫薯黑米","Category":"food","PayMethod":"alipay","Value":10.93},{"ID":288106797827194881,"CreatedAt":"2017-10-14T15:06:56.978284Z","UpdatedAt":"2017-10-14T15:06:56.978284Z","DeletedAt":null,"Name":"紫薯黑米","Category":"food","PayMethod":"alipay","Value":10.93},{"ID":288325987925229569,"CreatedAt":"2017-10-15T09:41:48.619033Z","UpdatedAt":"2017-10-15T09:41:48.619033Z","DeletedAt":null,"Name":"挂面","Category":"food","PayMethod":"alipay","Value":3.6}]
-      //accountArray: []
+      //accountArray: [{"ID":288094287488352257,"CreatedAt":"2017-10-14T14:03:19.123259Z","UpdatedAt":"2017-10-14T14:03:19.123259Z","DeletedAt":null,"Name":"紫薯黑米","Category":"food","PayMethod":"alipay","Value":10.93},{"ID":288106797827194881,"CreatedAt":"2017-10-14T15:06:56.978284Z","UpdatedAt":"2017-10-14T15:06:56.978284Z","DeletedAt":null,"Name":"紫薯黑米","Category":"food","PayMethod":"alipay","Value":10.93},{"ID":288325987925229569,"CreatedAt":"2017-10-15T09:41:48.619033Z","UpdatedAt":"2017-10-15T09:41:48.619033Z","DeletedAt":null,"Name":"挂面","Category":"food","PayMethod":"alipay","Value":3.6}]
+      accountArray: []
     };
   }
 
   componentDidMount() {
     var that = this;
-    fetch('http://localhost:1025/api/account').then(
-      response => response.json()
-    ).then(function(result) {
+    //fetch('http://localhost:1026/api/account', {
+    //  mode: 'no-cors'
+    //}).then(function(response) {
+    fetch('http://10.42.0.1:1026/api/account')
+    .then(function(response) {
+      //console.log('response: ' + JSON.stringify(response));
+      console.log('status: ' + response.status);
+      console.log('statusText: ' + response.statusText);
+      console.log('ok: ' + response.ok);
+      console.log('headers: ' + JSON.stringify(response.headers));
+      console.log('url: ' + response.url);
+      //console.log('text: ' + JSON.stringify(response.text()));
+      //console.log('json: ' + JSON.stringify(response.json()));
+      if(response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Network response was not ok.');
+      }
+      //response => response.json()
+    }).then(function(result) {
       if(result.status === 'success') {
         that.setState({
           accountArray: result.data
@@ -22,6 +39,8 @@ class AccountTable extends React.Component {
       } else {
         console.log('result: ', result);
       }
+    }).catch(function(error) {
+      console.log('error: ', error);
     });
   }
         
@@ -35,7 +54,7 @@ class AccountTable extends React.Component {
     </tr>;
 
     const tableBody = this.state.accountArray.map((account) =>
-      <tr>
+      <tr key={account.ID}>
         <td>{account.Name}</td>
         <td>{account.Value}</td>
         <td>{account.Category}</td>

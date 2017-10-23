@@ -3,7 +3,7 @@ package main
 import (
 	"./database"
 	"fmt"
-	"github.com/gin-contrib/static"
+	//"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"log"
 	//"strconv"
@@ -28,10 +28,12 @@ func main() {
 	router := gin.Default()
 
 	// serving static files
-	router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
-
+	// router.Use(static.Serve("/client", static.LocalFile("./client/build", true)))
+	// router.Static("/client", "./client/build");
 	// get journal account
 	router.GET("/api/account", func(context *gin.Context) {
+                // allow CORS
+		context.Header("Access-Control-Allow-Origin", "*")
 		var accounts []database.JournalAccount
 		db.Find(&accounts)
 		fmt.Printf("accounts: %v", accounts)
@@ -41,8 +43,22 @@ func main() {
 		})
 	})
 
+        // allow CORS
+	router.OPTIONS("/api/account", func(context *gin.Context) {
+		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Methods", "POST")
+		context.Header("Access-Control-Allow-Headers", "Content-Type")
+		context.JSON(200, gin.H{
+			"status": "success",
+		})
+        })
+
 	// record journal account
 	router.POST("/api/account", func(context *gin.Context) {
+                // allow CORS
+		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Methods", "POST")
+		context.Header("Access-Control-Allow-Headers", "Content-Type")
 		//Name := context.PostForm("Name")
 		//name := context.PostForm("name")
 		//fmt.Println("Name: " + Name)
@@ -87,5 +103,5 @@ func main() {
 		}
 	})
 
-	router.Run(":1025")
+	router.Run(":1026")
 }

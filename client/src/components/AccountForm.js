@@ -7,32 +7,30 @@ class AccountForm extends React.Component {
     super(props);
     this.state = {
       Name: '',
-      Value: 0,
+      Value: '',
       Category: 'Food',
-      PayMethod: 'Alipay'
+      PayMethod: 'Cmb'
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    console.log('constructor-state: ' + JSON.stringify(this.state));
   }
 
   handleInputChange(event) {
-    console.log('handleInputChange is called');
     const target = event.target;
-    const value = target.value;
+    let value = target.value;
     const name = target.name;
+    if(name === 'Value') {
+      value = parseInt(value, 10);
+    }
 
     this.setState({
       [name]: value
     });
-    console.log('state: ' + JSON.stringify(this.state));
   }
 
   handleSubmit(event) {
-    this.state.Value = parseInt(this.state.Value);
     console.log('state: ' + JSON.stringify(this.state));
-    //fetch('/api/account', {
-    fetch('http://localhost:1025/api/account', {
+    fetch('http://10.42.0.1:1026/api/account', {
       method: "POST",
       body: JSON.stringify(this.state),
       headers: {
@@ -44,14 +42,12 @@ class AccountForm extends React.Component {
       console.log('ok: ' + response.ok);
       console.log('headers: ' + JSON.stringify(response.headers));
       console.log('url: ' + response.url);
-      //console.log('text(): ' + JSON.stringify(response.text()));
       return response.json();
     }).then(function(json) {
       console.log('json: ' + JSON.stringify(json));
     }).catch(function(error) {
       console.log('error: ' + JSON.stringify(error));
     });
-    //alert('state: ' + JSON.stringify(this.state));
     event.preventDefault();
   }
 
@@ -64,7 +60,7 @@ class AccountForm extends React.Component {
             name="Name"
 	    type="text"
 	    value={this.state.Name}
-	    placeholder=""
+	    placeholder="请输入名称"
             onChange={this.handleInputChange}
 	  />
 	</FormGroup>
@@ -74,7 +70,7 @@ class AccountForm extends React.Component {
             name="Value"
 	    type="number"
 	    value={this.state.Value}
-	    placeholder=""
+	    placeholder="请输入金额"
             onChange={this.handleInputChange}
 	  />
 	</FormGroup>
@@ -110,10 +106,10 @@ class AccountForm extends React.Component {
 	    value={this.state.PayMethod}
             placeholder=""
             onChange={this.handleInputChange}>
-	    <option value="Alipay">支付宝</option>
-	    <option value="Wechat">微信</option>
 	    <option value="Cmb">招行</option>
 	    <option value="Cash">现金</option>
+	    <option value="Alipay">支付宝</option>
+	    <option value="Wechat">微信</option>
 	  </FormControl>
 	</FormGroup>
         <Button type="submit">

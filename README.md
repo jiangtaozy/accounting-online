@@ -16,7 +16,9 @@ go get -u github.com/jinzhu/gorm
 
 ### start a single-node cluster
 
-~/workspace/project/accounting-online$ cockroach start --insecure --store=store-1 --host=localhost
+~/workspace/project/accounting-online$
+
+cockroach start --insecure --store=store-1 --host=localhost
 
 
 
