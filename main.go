@@ -6,7 +6,7 @@ import (
 	//"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"log"
-	//"strconv"
+	"strconv"
 	// import GORM-related packages
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -31,65 +31,46 @@ func main() {
 	// router.Use(static.Serve("/client", static.LocalFile("./client/build", true)))
 	// router.Static("/client", "./client/build");
 	// get journal account
-	router.GET("/api/account", func(context *gin.Context) {
-                // allow CORS
+	router.GET("/api/accounts", func(context *gin.Context) {
+		// allow CORS
 		context.Header("Access-Control-Allow-Origin", "*")
 		var accounts []database.JournalAccount
 		db.Find(&accounts)
-		fmt.Printf("accounts: %v", accounts)
+		//fmt.Printf("accounts: %v", accounts)
 		context.JSON(200, gin.H{
-			"status": "success",
-			"data":   accounts,
+			"accounts": accounts,
 		})
 	})
 
-        // allow CORS
-	router.OPTIONS("/api/account", func(context *gin.Context) {
+	// allow CORS
+	router.OPTIONS("/api/accounts", func(context *gin.Context) {
 		context.Header("Access-Control-Allow-Origin", "*")
 		context.Header("Access-Control-Allow-Methods", "POST")
 		context.Header("Access-Control-Allow-Headers", "Content-Type")
 		context.JSON(200, gin.H{
 			"status": "success",
 		})
-        })
+	})
+
+	// allow CORS
+	router.OPTIONS("/api/accounts/:id", func(context *gin.Context) {
+		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Methods", "DELETE")
+		context.Header("Access-Control-Allow-Headers", "Content-Type")
+		context.JSON(200, gin.H{
+			"status": "success",
+		})
+	})
 
 	// record journal account
-	router.POST("/api/account", func(context *gin.Context) {
-                // allow CORS
+	router.POST("/api/accounts", func(context *gin.Context) {
+		// allow CORS
 		context.Header("Access-Control-Allow-Origin", "*")
 		context.Header("Access-Control-Allow-Methods", "POST")
 		context.Header("Access-Control-Allow-Headers", "Content-Type")
-		//Name := context.PostForm("Name")
-		//name := context.PostForm("name")
-		//fmt.Println("Name: " + Name)
-		//fmt.Println("name: " + name)
-		//Category := context.PostForm("Category")
-		//Paymethod := context.PostForm("Paymethod")
-		//Value, err := strconv.ParseFloat(context.PostForm("Value"), 64)
-		//if err != nil {
-		//	fmt.Println(err)
-		//}
-		//account := database.JournalAccount{
-		//	Name:      Name,
-		//	Category:  Category,
-		//	PayMethod: Paymethod,
-		//	Value:     Value,
-		//}
-		//type ValueStruct struct {
-		//	Value string `form:"Value" json:"Value" binding:"required"`
-		//}
-		//var valueStruct ValueStruct
-		//context.Bind(&valueStruct)
-		//fmt.Printf("valueStruct: %v", valueStruct)
 		var account database.JournalAccount
 		context.Bind(&account)
-		fmt.Printf("bind-account: %v", account)
-		//Value, err := strconv.ParseFloat(valueStruct.Value, 64)
-		//if err != nil {
-		//	fmt.Println(err)
-		//}
-		//account.Value = Value
-		//fmt.Printf("strconv-account: %v", account)
+		//fmt.Printf("bind-account: %v", account)
 		db.Create(&account)
 		fmt.Println(db.NewRecord(account))
 		if !db.NewRecord(account) {
@@ -103,5 +84,36 @@ func main() {
 		}
 	})
 
+	// delete account
+	router.DELETE("/api/accounts/:id", func(context *gin.Context) {
+		// allow CORS
+		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Methods", "DELETE")
+		context.Header("Access-Control-Allow-Headers", "Content-Type")
+		id, err := strconv.ParseUint(context.Param("id"), 10, 0)
+		if err != nil {
+			fmt.Printf("error: %v", err)
+			context.JSON(400, gin.H{
+				"status": "fail",
+			})
+			return
+		}
+		//fmt.Printf("id: %v \n", id)
+		var account database.JournalAccount
+		//account.ID = uint(id)
+		db.Find(&account, id)
+		fmt.Printf("new record: %t \n", db.NewRecord(account))
+		//db.First(&account, id)
+		//db.Where("ID = ?", id).First(&account)
+		fmt.Printf("account: %v \n", account)
+		//fmt.Printf("new record: %t \n", db.NewRecord(account))
+		//db.Delete(&account)
+		fmt.Printf("new record: %t \n", db.NewRecord(account))
+		//context.JSON(200, gin.H{
+		//	"status": "success",
+		//})
+	})
+
 	router.Run(":1026")
+
 }

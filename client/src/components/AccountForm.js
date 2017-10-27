@@ -1,5 +1,6 @@
 import React from 'react';
 import { FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap';
+import axios from '../axios';
 
 class AccountForm extends React.Component {
 
@@ -30,23 +31,11 @@ class AccountForm extends React.Component {
 
   handleSubmit(event) {
     console.log('state: ' + JSON.stringify(this.state));
-    fetch('http://10.42.0.1:1026/api/account', {
-      method: "POST",
-      body: JSON.stringify(this.state),
-      headers: {
-	"Content-Type": "application/json"
+    axios.post('/accounts', this.state).then(function(response) {
+      console.log('response: ', response);
+      if(response.status === 200) {
+	alert('记录成功');
       }
-    }).then(function(response) {
-      console.log('status: ' + response.status);
-      console.log('statusText: ' + response.statusText);
-      console.log('ok: ' + response.ok);
-      console.log('headers: ' + JSON.stringify(response.headers));
-      console.log('url: ' + response.url);
-      return response.json();
-    }).then(function(json) {
-      console.log('json: ' + JSON.stringify(json));
-    }).catch(function(error) {
-      console.log('error: ' + JSON.stringify(error));
     });
     event.preventDefault();
   }
