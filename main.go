@@ -36,9 +36,23 @@ func main() {
 		context.Header("Access-Control-Allow-Origin", "*")
 		var accounts []database.JournalAccount
 		db.Find(&accounts)
-		//fmt.Printf("accounts: %v", accounts)
+		fmt.Printf("accounts: %v\n", accounts)
+		type JournalAccountStr struct {
+			ID_str string
+			database.JournalAccount
+		}
+		var accountStrs []JournalAccountStr
+		for i := 0; i < len(accounts); i++ {
+			id_str := strconv.FormatUint(uint64(accounts[i].ID), 10)
+			accountStr := JournalAccountStr{
+				JournalAccount: accounts[i],
+				ID_str:         id_str,
+			}
+			accountStrs = append(accountStrs, accountStr)
+		}
+		fmt.Printf("accountStrs: %v\n", accountStrs)
 		context.JSON(200, gin.H{
-			"accounts": accounts,
+			"accounts": accountStrs,
 		})
 	})
 
@@ -98,20 +112,13 @@ func main() {
 			})
 			return
 		}
-		//fmt.Printf("id: %v \n", id)
 		var account database.JournalAccount
-		//account.ID = uint(id)
-		db.Find(&account, id)
+		account.ID = uint(id)
 		fmt.Printf("new record: %t \n", db.NewRecord(account))
-		//db.First(&account, id)
-		//db.Where("ID = ?", id).First(&account)
-		fmt.Printf("account: %v \n", account)
-		//fmt.Printf("new record: %t \n", db.NewRecord(account))
-		//db.Delete(&account)
-		fmt.Printf("new record: %t \n", db.NewRecord(account))
-		//context.JSON(200, gin.H{
-		//	"status": "success",
-		//})
+		db.Delete(&account)
+		context.JSON(200, gin.H{
+			"status": "success",
+		})
 	})
 
 	router.Run(":1026")

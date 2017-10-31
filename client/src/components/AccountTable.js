@@ -77,7 +77,7 @@ class AccountTable extends React.Component {
         <td>
           <Panel collapsible expanded={account.Expanded}>
             <Button bsStyle="danger" onClick={(e) =>
-              this.delete(account.ID, e)}>删除</Button>
+              this.delete(account.ID_str, e)}>删除</Button>
             <Button bsStyle="primary">编辑</Button>
             <Button bsStyle="info">取消</Button>
           </Panel>
