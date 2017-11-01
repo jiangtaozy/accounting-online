@@ -22,7 +22,7 @@ class AccountTable extends React.Component {
     axios.get('/accounts').then(function(response) {
       console.log('axios response: ', JSON.stringify(response));
       that.setState({
-        accountArray: response.data.accounts
+        accountArray: response.data.accounts || []
       });
     });
   }
