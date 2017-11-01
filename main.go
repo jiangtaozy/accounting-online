@@ -3,7 +3,7 @@ package main
 import (
 	"./database"
 	"fmt"
-	//"github.com/gin-contrib/static"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"log"
 	"strconv"
@@ -28,8 +28,8 @@ func main() {
 	router := gin.Default()
 
 	// serving static files
-	// router.Use(static.Serve("/client", static.LocalFile("./client/build", true)))
-	// router.Static("/client", "./client/build");
+	router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
+	//router.Static("/client", "./client/build")
 	// get journal account
 	router.GET("/api/accounts", func(context *gin.Context) {
 		// allow CORS

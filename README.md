@@ -12,7 +12,11 @@ go get -u github.com/lib/pq
 
 go get -u github.com/jinzhu/gorm
 
+### install cockroach
 
+wget -qO- https://binaries.cockroachdb.com/cockroach-v1.1.1.linux-amd64.tgz | tar  xvz
+
+cp -i cockroach-v1.1.1.linux-amd64/cockroach /usr/local/bin
 
 ### start a single-node cluster
 
