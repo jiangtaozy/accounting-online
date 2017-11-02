@@ -21,7 +21,7 @@ class AccountForm extends React.Component {
     let value = target.value;
     const name = target.name;
     if(name === 'Value') {
-      value = parseInt(value, 10);
+      value = parseFloat(value);
     }
 
     this.setState({
