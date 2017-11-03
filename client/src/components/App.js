@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
-import AccountTable from './AccountTable';
-import AccountForm from './AccountForm';
+import BottomTab from './BottomTab';
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <AccountTable />
-        <AccountForm />
+        <BottomTab />
       </div>
     );
   }
