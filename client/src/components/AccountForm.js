@@ -30,11 +30,18 @@ class AccountForm extends React.Component {
   }
 
   handleSubmit(event) {
+    let that = this;
     console.log('state: ' + JSON.stringify(this.state));
     axios.post('/accounts', this.state).then(function(response) {
       console.log('response: ', response);
       if(response.status === 200) {
 	alert('记录成功');
+        that.setState({
+          Name: '',
+          Value: '',
+          Category: 'Food',
+          PayMethod: 'Cmb'
+        });
       }
     });
     event.preventDefault();
