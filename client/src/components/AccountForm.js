@@ -1,17 +1,21 @@
 import React from 'react';
 import { FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap';
-import axios from '../axios';
+//import axios from '../axios';
 
 class AccountForm extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      Name: '',
-      Value: '',
-      Category: 'Food',
-      PayMethod: 'Cmb'
-    };
+    if(Object.keys(props.modifyAccount).length !== 0) {
+      this.state = props.modifyAccount;
+    } else {
+      this.state = {
+        Name: '',
+        Value: '',
+        Category: 'Food',
+        PayMethod: 'Cmb'
+      };
+    }
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -31,18 +35,13 @@ class AccountForm extends React.Component {
 
   handleSubmit(event) {
     let that = this;
-    console.log('state: ' + JSON.stringify(this.state));
-    axios.post('/accounts', this.state).then(function(response) {
-      console.log('response: ', response);
-      if(response.status === 200) {
-	alert('记录成功');
-        that.setState({
-          Name: '',
-          Value: '',
-          Category: 'Food',
-          PayMethod: 'Cmb'
-        });
-      }
+    this.props.onSubmitButtonClick(this.state, function() {
+      that.setState({
+        Name: '',
+        Value: '',
+        Category: 'Food',
+        PayMethod: 'Cmb'
+      });
     });
     event.preventDefault();
   }
@@ -108,8 +107,8 @@ class AccountForm extends React.Component {
 	    <option value="Wechat">微信</option>
 	  </FormControl>
 	</FormGroup>
-        <Button type="submit">
-          记录
+        <Button type="submit" block bsStyle="info">
+          确定
         </Button>
       </form>
     );

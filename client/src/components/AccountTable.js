@@ -11,6 +11,7 @@ class AccountTable extends React.Component {
     this.expandPanel = this.expandPanel.bind(this);
     this.delete = this.delete.bind(this);
     this.getAccounts = this.getAccounts.bind(this);
+    this.handleModifyButtonClick = this.handleModifyButtonClick.bind(this);
   }
 
   componentDidMount() {
@@ -20,7 +21,6 @@ class AccountTable extends React.Component {
   getAccounts() {
     var that = this;
     axios.get('/accounts').then(function(response) {
-      console.log('axios response: ', JSON.stringify(response));
       that.setState({
         accountArray: response.data.accounts || []
       });
@@ -48,12 +48,16 @@ class AccountTable extends React.Component {
   delete(id, e) {
     let that = this;
     axios.delete('/accounts/' + id).then(function(response) {
-      console.log('response: ', response);
       if(response.status === 200) {
 	alert('删除成功');
         that.getAccounts();
       }
     });
+    e.preventDefault();
+  }
+
+  handleModifyButtonClick(account, e) {
+    this.props.onModifyButtonClick(account);
     e.preventDefault();
   }
 
@@ -78,7 +82,8 @@ class AccountTable extends React.Component {
           <Panel collapsible expanded={account.Expanded}>
             <Button bsStyle="danger" onClick={(e) =>
               this.delete(account.ID_str, e)}>删除</Button>
-            <Button bsStyle="primary">编辑</Button>
+            <Button bsStyle="primary" onClick={(e) =>
+              this.handleModifyButtonClick(account, e)}>编辑</Button>
             <Button bsStyle="info">取消</Button>
           </Panel>
         </td>

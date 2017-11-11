@@ -36,7 +36,7 @@ func main() {
 		context.Header("Access-Control-Allow-Origin", "*")
 		var accounts []database.JournalAccount
 		db.Find(&accounts)
-		fmt.Printf("accounts: %v\n", accounts)
+		//fmt.Printf("accounts: %v\n", accounts)
 		type JournalAccountStr struct {
 			ID_str string
 			database.JournalAccount
@@ -50,7 +50,7 @@ func main() {
 			}
 			accountStrs = append(accountStrs, accountStr)
 		}
-		fmt.Printf("accountStrs: %v\n", accountStrs)
+		//fmt.Printf("accountStrs: %v\n", accountStrs)
 		context.JSON(200, gin.H{
 			"accounts": accountStrs,
 		})
@@ -69,7 +69,7 @@ func main() {
 	// allow CORS
 	router.OPTIONS("/api/accounts/:id", func(context *gin.Context) {
 		context.Header("Access-Control-Allow-Origin", "*")
-		context.Header("Access-Control-Allow-Methods", "DELETE")
+		context.Header("Access-Control-Allow-Methods", "DELETE,PATCH")
 		context.Header("Access-Control-Allow-Headers", "Content-Type")
 		context.JSON(200, gin.H{
 			"status": "success",
@@ -86,7 +86,7 @@ func main() {
 		context.Bind(&account)
 		//fmt.Printf("bind-account: %v", account)
 		db.Create(&account)
-		fmt.Println(db.NewRecord(account))
+		//fmt.Println(db.NewRecord(account))
 		if !db.NewRecord(account) {
 			context.JSON(200, gin.H{
 				"status": "success",
@@ -114,12 +114,37 @@ func main() {
 		}
 		var account database.JournalAccount
 		account.ID = uint(id)
-		fmt.Printf("new record: %t \n", db.NewRecord(account))
+		//fmt.Printf("new record: %t \n", db.NewRecord(account))
 		db.Delete(&account)
 		context.JSON(200, gin.H{
 			"status": "success",
 		})
 	})
+
+  // modify account
+  router.PATCH("/api/accounts/:id", func(context *gin.Context) {
+		// allow CORS
+		context.Header("Access-Control-Allow-Origin", "*")
+		context.Header("Access-Control-Allow-Methods", "PATCH")
+		context.Header("Access-Control-Allow-Headers", "Content-Type")
+		id, err := strconv.ParseUint(context.Param("id"), 10, 0)
+		if err != nil {
+			fmt.Printf("error: %v", err)
+			context.JSON(400, gin.H{
+				"status": "fail",
+			})
+			return
+		}
+		var account database.JournalAccount
+		context.Bind(&account)
+		account.ID = uint(id)
+		//fmt.Printf("id-account: %v \n", account)
+		//fmt.Printf("new record: %t \n", db.NewRecord(account))
+    db.Model(&account).Updates(&account)
+		context.JSON(200, gin.H{
+			"status": "success",
+		})
+  })
 
 	router.Run(":1026")
 
