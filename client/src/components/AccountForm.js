@@ -43,7 +43,7 @@ class AccountForm extends React.Component {
         PayMethod: 'Cmb'
       });
     });
-    event.preventDefault();
+    //event.preventDefault();
   }
 
   render() {

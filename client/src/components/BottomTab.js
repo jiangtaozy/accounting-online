@@ -2,6 +2,7 @@ import React from 'react';
 import { Tab } from 'semantic-ui-react';
 import AccountTable from './AccountTable';
 import AccountForm from './AccountForm';
+import BalanceForm from './BalanceForm';
 import axios from '../axios';
 
 class BottomTab extends React.Component {
@@ -15,8 +16,9 @@ class BottomTab extends React.Component {
     };
     this.handleTab = this.handleTab.bind(this);
     this.handleModifyButtonClick = this.handleModifyButtonClick.bind(this);
-    this.handleSubmitRecordButtonClick = this.handleSubmitRecordButtonClick.bind(this);
-    this.handleSubmitModifyButtonClick = this.handleSubmitModifyButtonClick.bind(this);
+    this.handleAccountSubmitRecordButtonClick = this.handleAccountSubmitRecordButtonClick.bind(this);
+    this.handleAccountSubmitModifyButtonClick = this.handleAccountSubmitModifyButtonClick.bind(this);
+    this.handleBalanceSubmitButtonClick = this.handleBalanceSubmitButtonClick.bind(this);
   }
 
   handleTab(event, data) {
@@ -43,7 +45,7 @@ class BottomTab extends React.Component {
     });
   }
 
-  handleSubmitRecordButtonClick(account, next) {
+  handleAccountSubmitRecordButtonClick(account, next) {
     axios.post('/accounts', account).then(function(response) {
       if(response.status === 200) {
         alert('记录成功');
@@ -52,7 +54,17 @@ class BottomTab extends React.Component {
     });
   }
 
-  handleSubmitModifyButtonClick(account, next) {
+  handleBalanceSubmitButtonClick(balance, next) {
+    console.log('balance: ', balance);
+    axios.post('/balances', balance).then(function(response) {
+      if(response.status === 200) {
+        alert('记录成功');
+        next();
+      }
+    });
+  }
+
+  handleAccountSubmitModifyButtonClick(account, next) {
     let that = this;
     let id = account.ID_str;
     delete account.ID;
@@ -74,13 +86,24 @@ class BottomTab extends React.Component {
 
   render() {
     const panes = [
-      { menuItem: '账目', render: () => <Tab.Pane><AccountTable onModifyButtonClick={this.handleModifyButtonClick} /></Tab.Pane> },
-      { menuItem: this.state.modify? '编辑': '记录', render: () => <Tab.Pane><AccountForm modifyAccount={this.state.modifyAccount} onSubmitButtonClick={this.state.modify? this.handleSubmitModifyButtonClick: this.handleSubmitRecordButtonClick} /></Tab.Pane> },
+      { menuItem: '账目',
+	render: () => <Tab.Pane>
+	  <AccountTable onModifyButtonClick={this.handleModifyButtonClick} />
+	</Tab.Pane> },
+      { menuItem: this.state.modify? '编辑': '记录',
+	render: () => <Tab.Pane>
+	  <AccountForm modifyAccount={this.state.modifyAccount}
+	    onSubmitButtonClick={this.state.modify? this.handleAccountSubmitModifyButtonClick: this.handleAccountSubmitRecordButtonClick} />
+	</Tab.Pane> },
+      { menuItem: '记录基础数据',
+	render: () => <Tab.Pane>
+	  <BalanceForm onSubmitButtonClick={this.handleBalanceSubmitButtonClick} />
+	</Tab.Pane> },
     ];
 
     return (
       <Tab activeIndex={this.state.activeIndex}
-        menu={{ fixed: 'bottom', widths: 2 }}
+        menu={{ fixed: 'bottom', widths: 3 }}
         onTabChange={this.handleTab}
         panes={panes} />
     );
