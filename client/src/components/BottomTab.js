@@ -87,18 +87,18 @@ class BottomTab extends React.Component {
   render() {
     const panes = [
       { menuItem: '账目',
-	render: () => <Tab.Pane>
-	  <AccountTable onModifyButtonClick={this.handleModifyButtonClick} />
-	</Tab.Pane> },
+	      render: () => <Tab.Pane>
+	        <AccountTable onModifyButtonClick={this.handleModifyButtonClick} />
+	      </Tab.Pane> },
       { menuItem: this.state.modify? '编辑': '记录',
-	render: () => <Tab.Pane>
-	  <AccountForm modifyAccount={this.state.modifyAccount}
-	    onSubmitButtonClick={this.state.modify? this.handleAccountSubmitModifyButtonClick: this.handleAccountSubmitRecordButtonClick} />
-	</Tab.Pane> },
+	      render: () => <Tab.Pane>
+	        <AccountForm modifyAccount={this.state.modifyAccount}
+	          onSubmitButtonClick={this.state.modify? this.handleAccountSubmitModifyButtonClick: this.handleAccountSubmitRecordButtonClick} />
+	      </Tab.Pane> },
       { menuItem: '记录基础数据',
-	render: () => <Tab.Pane>
-	  <BalanceForm onSubmitButtonClick={this.handleBalanceSubmitButtonClick} />
-	</Tab.Pane> },
+	      render: () => <Tab.Pane>
+	        <BalanceForm onSubmitButtonClick={this.handleBalanceSubmitButtonClick} />
+      	</Tab.Pane> },
     ];
 
     return (

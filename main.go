@@ -1,7 +1,6 @@
 package main
 
 import (
-	"./database"
 	"fmt"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
@@ -11,6 +10,8 @@ import (
 	// import GORM-related packages
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"./database"
+  "./controller/balances"
 )
 
 func main() {
@@ -114,6 +115,9 @@ func main() {
 			"status": "success",
 		})
   })
+
+  apiRouter := router.Group("/api")
+  balances.BalancesRegister(apiRouter)
 
 	router.Run(":1026")
 

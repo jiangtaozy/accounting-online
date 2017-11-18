@@ -98,6 +98,7 @@ class BalanceForm extends React.Component {
         <Button type='submit' fluid color='teal'>
           确定
         </Button>
+        <Button/>
       </Form>
     );
   }

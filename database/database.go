@@ -1,7 +1,9 @@
 package database
 
 import (
+  "fmt"
 	"time"
+  "log"
 	// import GORM-related packages
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -15,6 +17,17 @@ func InitDb(db *gorm.DB) {
 		&IncomeStatement{},
 		&CashFlow{},
 	)
+}
+
+func GetDB() (*gorm.DB, error) {
+	// connect to the "accounting" database as the "dest" user.
+	const addr = "postgresql://dest@localhost:26257/accounting?sslmode=disable"
+	db, err := gorm.Open("postgres", addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+  db.LogMode(true)
+  return db, err
 }
 
 type JournalAccount struct {
@@ -44,6 +57,17 @@ type BalanceSheet struct {
 	Earnings           float64 // 本期收益
 	OwnersEquity       float64 // 所有者权益合计
 	Equities           float64 // 负债及所有者权益合计
+}
+
+func (balance *BalanceSheet) BeforeCreate(scope *gorm.Scope) (err error) {
+  balance.Funds = balance.Alipay + balance.Wechat + balance.Cmb + balance.Cash
+  balance.Assets = balance.Funds + balance.AccountsReceivable + balance.PrepaidExpenses
+  balance.Liabilities = balance.AccountsPayable
+  balance.OwnersEquity = balance.OriginalInvestment + balance.RetainedEarnings + balance.Earnings
+  balance.Equities = balance.Liabilities + balance.OwnersEquity
+
+  fmt.Printf("balance: %v", balance)
+  return nil
 }
 
 // 利润表
