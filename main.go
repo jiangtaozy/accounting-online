@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+  "github.com/gin-contrib/cors"
 	"log"
 	"strconv"
 	// import GORM-related packages
@@ -26,14 +27,14 @@ func main() {
 	database.InitDb(db)
 
 	router := gin.Default()
+  // allow all origin cors
+  router.Use(cors.Default())
 
 	// serving static files
 	router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
 	//router.Static("/client", "./client/build")
 	// get journal account
 	router.GET("/api/accounts", func(context *gin.Context) {
-		// allow CORS
-		context.Header("Access-Control-Allow-Origin", "*")
 		var accounts []database.JournalAccount
 		db.Find(&accounts)
 		//fmt.Printf("accounts: %v\n", accounts)
@@ -56,32 +57,8 @@ func main() {
 		})
 	})
 
-	// allow CORS
-	router.OPTIONS("/api/accounts", func(context *gin.Context) {
-		context.Header("Access-Control-Allow-Origin", "*")
-		context.Header("Access-Control-Allow-Methods", "POST")
-		context.Header("Access-Control-Allow-Headers", "Content-Type")
-		context.JSON(200, gin.H{
-			"status": "success",
-		})
-	})
-
-	// allow CORS
-	router.OPTIONS("/api/accounts/:id", func(context *gin.Context) {
-		context.Header("Access-Control-Allow-Origin", "*")
-		context.Header("Access-Control-Allow-Methods", "DELETE,PATCH")
-		context.Header("Access-Control-Allow-Headers", "Content-Type")
-		context.JSON(200, gin.H{
-			"status": "success",
-		})
-	})
-
 	// record journal account
 	router.POST("/api/accounts", func(context *gin.Context) {
-		// allow CORS
-		context.Header("Access-Control-Allow-Origin", "*")
-		context.Header("Access-Control-Allow-Methods", "POST")
-		context.Header("Access-Control-Allow-Headers", "Content-Type")
 		var account database.JournalAccount
 		context.Bind(&account)
 		//fmt.Printf("bind-account: %v", account)
@@ -100,10 +77,6 @@ func main() {
 
 	// delete account
 	router.DELETE("/api/accounts/:id", func(context *gin.Context) {
-		// allow CORS
-		context.Header("Access-Control-Allow-Origin", "*")
-		context.Header("Access-Control-Allow-Methods", "DELETE")
-		context.Header("Access-Control-Allow-Headers", "Content-Type")
 		id, err := strconv.ParseUint(context.Param("id"), 10, 0)
 		if err != nil {
 			fmt.Printf("error: %v", err)
@@ -123,10 +96,6 @@ func main() {
 
   // modify account
   router.PATCH("/api/accounts/:id", func(context *gin.Context) {
-		// allow CORS
-		context.Header("Access-Control-Allow-Origin", "*")
-		context.Header("Access-Control-Allow-Methods", "PATCH")
-		context.Header("Access-Control-Allow-Headers", "Content-Type")
 		id, err := strconv.ParseUint(context.Param("id"), 10, 0)
 		if err != nil {
 			fmt.Printf("error: %v", err)
