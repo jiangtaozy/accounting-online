@@ -3,6 +3,7 @@ import { Tab } from 'semantic-ui-react';
 import AccountTable from './AccountTable';
 import AccountForm from './AccountForm';
 import BalanceForm from './BalanceForm';
+import CommonTable from './CommonTable';
 import axios from '../axios';
 
 class BottomTab extends React.Component {
@@ -34,7 +35,7 @@ class BottomTab extends React.Component {
       activeIndex: activeIndex,
       modifyAccount: modifyAccount
     });
-    console.log('state: ', this.state);
+    //console.log('state: ', this.state);
   }
 
   handleModifyButtonClick(account) {
@@ -55,7 +56,7 @@ class BottomTab extends React.Component {
   }
 
   handleBalanceSubmitButtonClick(balance, next) {
-    console.log('balance: ', balance);
+    //console.log('balance: ', balance);
     axios.post('/balances', balance).then(function(response) {
       if(response.status === 200) {
         alert('记录成功');
@@ -86,28 +87,111 @@ class BottomTab extends React.Component {
 
   render() {
     const panes = [
-      { menuItem: '账目',
+      {
+        menuItem: '账目',
 	      render: () => <Tab.Pane>
 	        <AccountTable onModifyButtonClick={this.handleModifyButtonClick} />
-	      </Tab.Pane> },
-      { menuItem: this.state.modify? '编辑': '记录',
+	      </Tab.Pane>
+      },
+      {
+        menuItem: this.state.modify? '编辑': '记录',
 	      render: () => <Tab.Pane>
 	        <AccountForm modifyAccount={this.state.modifyAccount}
 	          onSubmitButtonClick={this.state.modify? this.handleAccountSubmitModifyButtonClick: this.handleAccountSubmitRecordButtonClick} />
-	      </Tab.Pane> },
-      { menuItem: '记录基础数据',
+	      </Tab.Pane>
+      },
+      {
+        menuItem: '记录基础数据',
 	      render: () => <Tab.Pane>
 	        <BalanceForm onSubmitButtonClick={this.handleBalanceSubmitButtonClick} />
-      	</Tab.Pane> },
+      	</Tab.Pane>
+      },
+      { 
+        menuItem: '资产负债表',
+        render: () => <Tab.Pane>
+          <CommonTable headerArray = {this.balanceSheetHeaderArray}
+            getData = {this.getBalanceData} />
+        </Tab.Pane>
+      }
     ];
 
     return (
       <Tab activeIndex={this.state.activeIndex}
-        menu={{ fixed: 'bottom', widths: 3 }}
+        menu={{ fixed: 'bottom', widths: panes.length }}
         onTabChange={this.handleTab}
         panes={panes} />
     );
   }
+
+  getBalanceData() {
+    return axios.get('/balances').then((response) => {
+      //console.log('response: ', response)
+      return Promise.resolve(response.data.balances)
+    })
+  }
+
+  balanceSheetHeaderArray = [
+    {
+      name: '支付宝',
+      key: 'Alipay',
+    },
+    {
+      name: '微信',
+      key: 'Wechat',
+    },
+    {
+      name: '招行',
+      key: 'Cmb',
+    },
+    {
+      name: '现金',
+      key: 'Cash',
+    },
+    {
+      name: '资金合计',
+      key: 'Funds',
+    },
+    {
+      name: '应收账款',
+      key: 'AccountsReceivable',
+    },
+    {
+      name: '待摊费用',
+      key: 'PrepaidExpenses',
+    },
+    {
+      name: '总资产',
+      key: 'Assets',
+    },
+    {
+      name: '应付票据',
+      key: 'AccountsPayable',
+    },
+    {
+      name: '负债合计',
+      key: 'Liabilities',
+    },
+    {
+      name: '初始投资',
+      key: 'OriginalInvestment',
+    },
+    {
+      name: '留存收益',
+      key: 'RetainedEarnings',
+    },
+    {
+      name: '本期收益',
+      key: 'Earnings',
+    },
+    {
+      name: '所有者权益合计',
+      key: 'OwnersEquity',
+    },
+    {
+      name: '负债及所有者权益合计',
+      key: 'Equities',
+    },
+  ]
 }
 
 export default BottomTab;

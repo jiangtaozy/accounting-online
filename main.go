@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+  "math"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
   "github.com/gin-contrib/cors"
@@ -29,7 +30,10 @@ func main() {
 
 	router := gin.Default()
   // allow all origin cors
-  router.Use(cors.Default())
+  config := cors.DefaultConfig()
+  config.AllowAllOrigins = true
+  config.AddAllowMethods("PATCH")
+  router.Use(cors.New(config))
 
 	// serving static files
 	router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
@@ -62,6 +66,12 @@ func main() {
 	router.POST("/api/accounts", func(context *gin.Context) {
 		var account database.JournalAccount
 		context.Bind(&account)
+    switch account.Category {
+    case "Salary", "Interest", "OtherIncome":
+      account.Value = math.Abs(account.Value)
+    default:
+      account.Value = -math.Abs(account.Value)
+    }
 		//fmt.Printf("bind-account: %v", account)
 		db.Create(&account)
 		//fmt.Println(db.NewRecord(account))
@@ -108,8 +118,14 @@ func main() {
 		var account database.JournalAccount
 		context.Bind(&account)
 		account.ID = uint(id)
-		//fmt.Printf("id-account: %v \n", account)
-		//fmt.Printf("new record: %t \n", db.NewRecord(account))
+    switch account.Category {
+    case "Salary", "Interest", "OtherIncome":
+      account.Value = math.Abs(account.Value)
+    default:
+      account.Value = -math.Abs(account.Value)
+    }
+		fmt.Printf("id-account: %v \n", account)
+		fmt.Printf("new record: %t \n", db.NewRecord(account))
     db.Model(&account).Updates(&account)
 		context.JSON(200, gin.H{
 			"status": "success",
