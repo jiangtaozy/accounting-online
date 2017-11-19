@@ -12,10 +12,12 @@ class CommonTable extends React.Component {
   componentDidMount() {
     const that = this
     this.props.getData().then((data) => {
-      //console.log('data: ', data)
-      that.setState({
-        dataArray: data,
-      })
+      console.log('data: ', data)
+      if(data) {
+        that.setState({
+          dataArray: data,
+        })
+      }
     })
   }
 
