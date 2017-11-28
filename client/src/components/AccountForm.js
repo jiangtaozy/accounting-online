@@ -13,7 +13,7 @@ class AccountForm extends React.Component {
         Name: '',
         Value: '',
         Category: 'Food',
-        PayMethod: 'Cmb'
+        PayMethod: 'Alipay'
       };
     }
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -40,10 +40,10 @@ class AccountForm extends React.Component {
         Name: '',
         Value: '',
         Category: 'Food',
-        PayMethod: 'Cmb'
+        PayMethod: 'Alipay'
       });
     });
-    //event.preventDefault();
+    event.preventDefault();
   }
 
   render() {
