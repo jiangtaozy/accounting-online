@@ -1,18 +1,16 @@
 package main
 
 import (
-	"fmt"
-  "math"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-  "github.com/gin-contrib/cors"
 	"log"
-	"strconv"
 	// import GORM-related packages
+	"./controller/accounts"
+	"./controller/balances"
+	"./database"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"./database"
-  "./controller/balances"
 )
 
 func main() {
@@ -29,111 +27,17 @@ func main() {
 	database.InitDb(db)
 
 	router := gin.Default()
-  // allow all origin cors
-  config := cors.DefaultConfig()
-  config.AllowAllOrigins = true
-  config.AddAllowMethods("PATCH")
-  router.Use(cors.New(config))
+	// allow all origin cors
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AddAllowMethods("PATCH")
+	router.Use(cors.New(config))
 
 	// serving static files
 	router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
-	//router.Static("/client", "./client/build")
-	// get journal account
-	router.GET("/api/accounts", func(context *gin.Context) {
-		var accounts []database.JournalAccount
-		db.Find(&accounts)
-		//fmt.Printf("accounts: %v\n", accounts)
-		type JournalAccountStr struct {
-			ID_str string
-			database.JournalAccount
-		}
-		var accountStrs []JournalAccountStr
-		for i := 0; i < len(accounts); i++ {
-			id_str := strconv.FormatUint(uint64(accounts[i].ID), 10)
-			accountStr := JournalAccountStr{
-				JournalAccount: accounts[i],
-				ID_str:         id_str,
-			}
-			accountStrs = append(accountStrs, accountStr)
-		}
-		//fmt.Printf("accountStrs: %v\n", accountStrs)
-		context.JSON(200, gin.H{
-			"accounts": accountStrs,
-		})
-	})
-
-	// record journal account
-	router.POST("/api/accounts", func(context *gin.Context) {
-		var account database.JournalAccount
-		context.Bind(&account)
-    switch account.Category {
-    case "Salary", "Interest", "OtherIncome":
-      account.Value = math.Abs(account.Value)
-    default:
-      account.Value = -math.Abs(account.Value)
-    }
-		//fmt.Printf("bind-account: %v", account)
-		db.Create(&account)
-		//fmt.Println(db.NewRecord(account))
-		if !db.NewRecord(account) {
-			context.JSON(200, gin.H{
-				"status": "success",
-			})
-		} else {
-			context.JSON(200, gin.H{
-				"status": "fail",
-			})
-		}
-	})
-
-	// delete account
-	router.DELETE("/api/accounts/:id", func(context *gin.Context) {
-		id, err := strconv.ParseUint(context.Param("id"), 10, 0)
-		if err != nil {
-			fmt.Printf("error: %v", err)
-			context.JSON(400, gin.H{
-				"status": "fail",
-			})
-			return
-		}
-		var account database.JournalAccount
-		account.ID = uint(id)
-		//fmt.Printf("new record: %t \n", db.NewRecord(account))
-		db.Delete(&account)
-		context.JSON(200, gin.H{
-			"status": "success",
-		})
-	})
-
-  // modify account
-  router.PATCH("/api/accounts/:id", func(context *gin.Context) {
-		id, err := strconv.ParseUint(context.Param("id"), 10, 0)
-		if err != nil {
-			fmt.Printf("error: %v", err)
-			context.JSON(400, gin.H{
-				"status": "fail",
-			})
-			return
-		}
-		var account database.JournalAccount
-		context.Bind(&account)
-		account.ID = uint(id)
-    switch account.Category {
-    case "Salary", "Interest", "OtherIncome":
-      account.Value = math.Abs(account.Value)
-    default:
-      account.Value = -math.Abs(account.Value)
-    }
-		fmt.Printf("id-account: %v \n", account)
-		fmt.Printf("new record: %t \n", db.NewRecord(account))
-    db.Model(&account).Updates(&account)
-		context.JSON(200, gin.H{
-			"status": "success",
-		})
-  })
-
-  apiRouter := router.Group("/api")
-  balances.BalancesRegister(apiRouter)
+	apiRouter := router.Group("/api")
+	accounts.AccountsRegister(apiRouter)
+	balances.BalancesRegister(apiRouter)
 
 	router.Run(":1026")
 
