@@ -2,7 +2,6 @@ package balances
 
 import (
 	"../../database"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -22,7 +21,6 @@ func BalanceCreate(context *gin.Context) {
 	defer db.Close()
 	var balance database.BalanceSheet
 	context.Bind(&balance)
-	fmt.Printf("bind-balance: %v\n", balance)
 	db.Create(&balance)
 	if !db.NewRecord(balance) {
 		context.JSON(200, gin.H{
@@ -58,6 +56,33 @@ func BalanceGet(context *gin.Context) {
 		}
 		balanceStrs = append(balanceStrs, balanceStr)
 	}
+	// get accounts
+	var accounts []database.JournalAccount
+	db.Find(&accounts)
+	length := len(balanceStrs)
+	balanceNow := balanceStrs[length-1]
+	balanceNow.RetainedEarnings = balanceStrs[length-1].RetainedEarnings + balanceStrs[length-1].Earnings
+	balanceNow.Earnings = 0
+	for i := 0; i < len(accounts); i++ {
+		account := accounts[i]
+		switch account.PayMethod {
+		case "Alipay":
+			balanceNow.Alipay += account.Value
+		case "Wechat":
+			balanceNow.Wechat += account.Value
+		case "Cmb":
+			balanceNow.Cmb += account.Value
+		case "Cash":
+			balanceNow.Cash += account.Value
+		}
+		balanceNow.Earnings += account.Value
+	}
+	balanceNow.Funds = balanceNow.Alipay + balanceNow.Wechat + balanceNow.Cmb + balanceNow.Cash
+	balanceNow.Assets = balanceNow.Funds + balanceNow.AccountsReceivable + balanceNow.PrepaidExpenses
+	balanceNow.Liabilities = balanceNow.AccountsPayable
+	balanceNow.OwnersEquity = balanceNow.OriginalInvestment + balanceNow.RetainedEarnings + balanceNow.Earnings
+	balanceNow.Equities = balanceNow.Liabilities + balanceNow.OwnersEquity
+	balanceStrs = append(balanceStrs, balanceNow)
 	context.JSON(200, gin.H{
 		"balances": balanceStrs,
 	})
