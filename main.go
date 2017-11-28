@@ -30,7 +30,7 @@ func main() {
 	// allow all origin cors
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
-	config.AddAllowMethods("PATCH")
+	config.AddAllowMethods("PATCH", "DELETE")
 	router.Use(cors.New(config))
 
 	// serving static files
