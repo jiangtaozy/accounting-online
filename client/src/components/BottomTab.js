@@ -1,3 +1,9 @@
+/*
+ * Maintained by jemo from 2017.11.19 to now
+ * Created by jemo on 2017.11.19
+ * Bottom tab
+ */
+
 import React from 'react';
 import { Tab } from 'semantic-ui-react';
 import AccountTable from './AccountTable';
@@ -12,7 +18,7 @@ class BottomTab extends React.Component {
     super(props);
     this.state = {
       modify: false,
-      activeIndex: 0,
+      activeIndex: 1,
       modifyAccount: {}
     };
     this.handleTab = this.handleTab.bind(this);
@@ -35,7 +41,6 @@ class BottomTab extends React.Component {
       activeIndex: activeIndex,
       modifyAccount: modifyAccount
     });
-    //console.log('state: ', this.state);
   }
 
   handleModifyButtonClick(account) {
@@ -56,7 +61,6 @@ class BottomTab extends React.Component {
   }
 
   handleBalanceSubmitButtonClick(balance, next) {
-    //console.log('balance: ', balance);
     axios.post('/balances', balance).then(function(response) {
       if(response.status === 200) {
         alert('记录成功');
@@ -125,7 +129,6 @@ class BottomTab extends React.Component {
 
   getBalanceData() {
     return axios.get('/balances').then((response) => {
-      //console.log('response: ', response)
       return Promise.resolve(response.data.balances)
     })
   }

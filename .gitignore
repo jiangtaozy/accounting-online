@@ -2,3 +2,6 @@
 
 # store
 /store-1
+
+# swp
+*.swp

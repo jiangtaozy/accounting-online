@@ -1,5 +1,11 @@
+/*
+ * Maintained by jemo from 2017.11.19 to now
+ * Created by jemo on 2017.11.19
+ * 资产负债表
+ */
+
 import React from 'react'
-import { Table } from 'semantic-ui-react'
+import { Table } from 'react-bootstrap';
 
 class CommonTable extends React.Component {
   constructor(props) {
@@ -12,7 +18,6 @@ class CommonTable extends React.Component {
   componentDidMount() {
     const that = this
     this.props.getData().then((data) => {
-      console.log('data: ', data)
       if(data) {
         that.setState({
           dataArray: data,
@@ -22,26 +27,36 @@ class CommonTable extends React.Component {
   }
 
   render() {
-    const headerComponentArray = this.props.headerArray.map((header, index) =>
-      <Table.HeaderCell key={index}>{header.name}</Table.HeaderCell>
-    )
-    const tableRowArray = this.state.dataArray.map((data, index) =>
-      <Table.Row key={index}>
-        {this.props.headerArray.map((header, index) =>
-          <Table.Cell key={index}>{data[header.key]}</Table.Cell>
+    const {
+      headerArray,
+    } = this.props
+    const tableHead = <tr>
+      {headerArray.map((header, index) =>
+        <th key={index}>
+          {header.name}
+        </th>
+      )}
+    </tr>;
+    const {
+      dataArray,
+    } = this.state
+    const tableBody = dataArray.map((data, index) =>
+      <tr key={index}>
+        {headerArray.map((header, index) =>
+          <td key={index}>
+            {Math.round(data[header.key] * 100) / 100}
+          </td>
         )}
-      </Table.Row>
-    )
+      </tr>
+    );
     return (
-      <Table celled>
-        <Table.Header>
-          <Table.Row>
-            {headerComponentArray}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {tableRowArray}
-        </Table.Body>
+      <Table responsive>
+        <thead>
+          {tableHead}
+        </thead>
+        <tbody>
+          {tableBody}
+        </tbody>
       </Table>
     )
   }

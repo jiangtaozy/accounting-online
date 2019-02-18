@@ -1,3 +1,9 @@
+/*
+ * Maintained by jemo from 2017.11.19 to now
+ * Created by jemo on 2017.11.19
+ * 帐目表
+ */
+
 import React from 'react';
 import { Table, Panel, Button } from 'react-bootstrap';
 import axios from '../axios';
